@@ -1,0 +1,7 @@
+*.xls
+*.xlsx
+venv/
+*~
+last_request_md5sum.txt
+*.txt
+!requirements.txt
