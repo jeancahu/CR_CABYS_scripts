@@ -4,6 +4,7 @@ from sys import exit
 from os.path import isfile
 
 import argparse
+import pandas as pd
 
 parser = argparse.ArgumentParser()
 
@@ -11,6 +12,14 @@ parser.add_argument(
     '-e', '--excel-file',
     help='Nombre del Excel de cabys',
     default='cabys.xlsx',
+    required=False,
+    type=str,
+)
+
+parser.add_argument(
+    '-t', '--xlsx-to-plain',
+    help='Leer Excel de cabys y convertirlo a texto plano.',
+    default='',
     required=False,
     type=str,
 )
@@ -41,7 +50,7 @@ def verify_html(line):
     return True
 
 
-def download_cabys():
+def download_cabys(excel_file):
     session = requests.Session()
     response = session.get(base_url+cabys_url)
 
@@ -94,13 +103,38 @@ def download_cabys():
     # Download the Cabys xlsx
     response = requests.get(base_url+cabys_xls_url, allow_redirects=False)
 
-    with open("cabys.xlsx","wb") as f:
+    with open(excel_file,"wb") as f:
         f.write(response.content)
+
+def xlsx_to_plain (output_file):
+    excel_data_df = pd.read_excel(
+        args.excel_file,
+        sheet_name='Cabys',
+        header=1, # Second row is the header
+    )
+
+    result = ''
+    for cat9, dcat9, iva in zip(
+            excel_data_df['Categoría 9'],
+            excel_data_df['Descripción (categoría 9)'],
+            excel_data_df['Impuesto'],
+    ):
+        if type(iva) == str:
+            iva = 0
+
+        result += "IVA: {}%, Cat9: {}, DCat9: {}\n".format(iva*100, cat9, dcat9)
+
+    with open(output_file, "wb") as f:
+        f.write(result.encode('utf-8'))
 
 def main():
     if args.download_cabys:
         print(f"Descargando el catálogo CABYS con el nombre {args.excel_file}")
-        download_cabys()
+        download_cabys(excel_file = args.excel_file)
+
+    if args.xlsx_to_plain:
+        print(f"Convirtiendo el catálogo CABYS con nombre {args.excel_file} a texto plano en el archivo {args.xlsx_to_plain}")
+        xlsx_to_plain(output_file = args.xlsx_to_plain)
 
 ## Execute main function
 if __name__ == "__main__":
