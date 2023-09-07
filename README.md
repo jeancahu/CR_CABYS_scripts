@@ -10,7 +10,7 @@
 
     # Save cabys as a txt
     python cabys_xlsx_to_txt.py > cabys.txt
-    bash search_cabys.sh <palabra_de_interes>
+    bash search_cabys.sh <palabra_de_interés>
 
     bash search_cabys.sh pescado
 ```

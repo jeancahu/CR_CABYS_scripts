@@ -1,6 +1,7 @@
 import requests, re
 import hashlib
 from sys import exit
+from os.path import isfile
 
 base_url="https://www.bccr.fi.cr"
 cabys_url="/indicadores-economicos/cat%C3%A1logo-de-bienes-y-servicios"
@@ -49,6 +50,10 @@ def main():
     print("Current md5sum :{}".format(md5sum))
 
     try:
+        ## Verifica si el cabys existe
+        if not isfile("cabys.xlsx"):
+            raise FileNotFoundError
+
         with open("last_request_md5sum.txt","r") as f:
 
             previous_md5sum = f.read()
