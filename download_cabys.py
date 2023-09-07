@@ -3,6 +3,27 @@ import hashlib
 from sys import exit
 from os.path import isfile
 
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    '-e', '--excel-file',
+    help='Nombre del Excel de cabys',
+    default='cabys.xlsx',
+    required=False,
+    type=str,
+)
+
+parser.add_argument(
+    '-D', '--download-cabys',
+    default=False,
+    action='store_true',
+    help='Descargar el Excel de cabys.',
+)
+
+args = parser.parse_args()
+
 base_url="https://www.bccr.fi.cr"
 cabys_url="/indicadores-economicos/cat%C3%A1logo-de-bienes-y-servicios"
 
@@ -20,7 +41,7 @@ def verify_html(line):
     return True
 
 
-def main():
+def download_cabys():
     session = requests.Session()
     response = session.get(base_url+cabys_url)
 
@@ -76,6 +97,10 @@ def main():
     with open("cabys.xlsx","wb") as f:
         f.write(response.content)
 
+def main():
+    if args.download_cabys:
+        print(f"Descargando el catálogo CABYS con el nombre {args.excel_file}")
+        download_cabys()
 
 ## Execute main function
 if __name__ == "__main__":
